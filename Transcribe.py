@@ -24,7 +24,7 @@ def convert_audio_file_to_format(args) -> None:
                      shell=True, stdout=subprocess.PIPE).stdout.read()
 
 
-def prepend_spacer() -> None:
+def prepend_spacer(args) -> None:
     """
     Prepend a silence to the beginning of the audio file
     """
@@ -117,14 +117,14 @@ def main(args):
     """
 
     DEVICE = torch.device("cuda" if torch.cuda.is_available()
-                          and args.device == "gpu" else "cpu")
+                          and args.device == "cuda" else "cpu")
     if args.device != DEVICE:
         print(
             f"args.device: {args.device} unavailable. Defaulting to {DEVICE}")
     ensure_directory_exists(args.output_dir)
     convert_audio_file_to_format(args)
     assert_env_defined("HUGGINGFACE_API_KEY")
-    prepend_spacer()
+    prepend_spacer(args)
     login(token=os.getenv("HUGGINGFACE_API_KEY"))
     pipeline = Pipeline.from_pretrained(
         'pyannote/speaker-diarization', use_auth_token=True)
